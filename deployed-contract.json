@@ -1,0 +1,9 @@
+{
+  "address": "0x024F8A35B856F1cb088619f681BD3a199058b576",
+  "deployer": "0xB1A4e075EA6B04357D6907864FCDF65B73Ea3b6E",
+  "network": "sepolia",
+  "chainId": 11155111,
+  "deployedAt": "2025-10-17T00:20:51.733Z",
+  "contractName": "EncryptedPolls",
+  "version": "updated-single-poll"
+}
