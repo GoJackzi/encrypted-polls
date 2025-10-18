@@ -201,3 +201,5 @@ export function CompactActivityMonitor({ logs }: { logs: ActivityLog[] }) {
     </div>
   )
 }
+
+

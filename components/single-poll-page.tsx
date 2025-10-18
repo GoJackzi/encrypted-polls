@@ -42,7 +42,7 @@ export default function SinglePollPage() {
   const [currentPollIndex, setCurrentPollIndex] = useState(0)
   const [pendingTransactions, setPendingTransactions] = useState<Set<number>>(new Set())
   const { logs, addLog, clearLogs } = usePollLogs()
-  const { fhevm, loading, error } = useFHEVM()
+  const { fhevm, loading, error, logs: fhevmLogs } = useFHEVM()
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
   
@@ -50,10 +50,70 @@ export default function SinglePollPage() {
   const currentPoll = POLLS[currentPollIndex]
   const totalPolls = POLLS.length
 
-  // Clear logs when navigating to a different poll
+  // Convert FHEVM ActivityLog to LogEntry format for display
+  const convertActivityLogToLogEntry = (activityLog: any) => {
+    const levelMap: { [key: string]: string } = {
+      'info': 'info',
+      'success': 'success', 
+      'warning': 'warning',
+      'error': 'error',
+      'debug': 'debug',
+      'encryption': 'info',
+      'computation': 'info',
+      'aggregation': 'info',
+      'decryption': 'info',
+      'result': 'success',
+      'relayer': 'info',
+      'contract': 'info'
+    }
+    
+    const categoryMap: { [key: string]: string } = {
+      'info': 'ui',
+      'success': 'vote',
+      'warning': 'ui',
+      'error': 'ui',
+      'debug': 'ui',
+      'encryption': 'fhevm',
+      'computation': 'fhevm',
+      'aggregation': 'fhevm',
+      'decryption': 'fhevm',
+      'result': 'vote',
+      'relayer': 'fhevm',
+      'contract': 'blockchain'
+    }
+
+    return {
+      id: activityLog.id,
+      timestamp: activityLog.timestamp.toLocaleTimeString(),
+      level: levelMap[activityLog.type] || 'info',
+      category: categoryMap[activityLog.type] || 'ui',
+      message: activityLog.message,
+      data: activityLog.technical
+    }
+  }
+
+
+  // Convert and display FHEVM logs
   useEffect(() => {
-    clearLogs()
-    addLog("info", "ui", `📱 Navigated to poll ${currentPollIndex + 1}/${totalPolls}`)
+    console.log("[Debug] FHEVM logs effect triggered:", { fhevmLogsCount: fhevmLogs?.length })
+    if (fhevmLogs && fhevmLogs.length > 0) {
+      // Clear existing logs and add all FHEVM logs
+      clearLogs()
+      console.log("[Debug] Cleared logs, adding all FHEVM logs:", fhevmLogs.length)
+      
+      fhevmLogs.forEach(activityLog => {
+        const logEntry = convertActivityLogToLogEntry(activityLog)
+        console.log("[Debug] Converting and adding log:", logEntry)
+        addLog(logEntry.level as any, logEntry.category as any, logEntry.message, logEntry.data)
+      })
+    }
+  }, [fhevmLogs, addLog, clearLogs])
+
+  // Clear logs when navigating to a different poll (but don't clear FHEVM logs)
+  useEffect(() => {
+    // Don't clear logs on navigation - let FHEVM logs persist
+    // clearLogs()
+    // addLog("info", "ui", `📱 Navigated to poll ${currentPollIndex + 1}/${totalPolls}`)
   }, [currentPollIndex, clearLogs, addLog, totalPolls])
 
   // Swipe gesture handlers

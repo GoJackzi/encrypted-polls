@@ -46,25 +46,45 @@ export function PollCard({ poll, addLog, clearLogs, onTransactionStart, onTransa
     //   addLog("info", "ui", `Poll ${poll.id}: Vote state restored from storage`)
     // }
 
-    // Fetch current results
-    fetchResults()
+    // Don't fetch results on mount - start with clean state
+    // fetchResults() // Removed to prevent unnecessary logs on load
   }, [poll.id])
 
   const fetchResults = async () => {
     try {
-      addLog("debug", "vote", `Fetching results for poll ${poll.id}`)
+      // Don't add basic logs - let the hybrid mock handle all logging
+      // addLog("debug", "vote", `Fetching results for poll ${poll.id}`)
+      
+      // Use the hybrid mock's getPollResults method for realistic behavior
+      if (fhevm && fhevm.getPollResults) {
+        const pollResults = await fhevm.getPollResults(poll.id)
+        setResults({
+          decrypted: pollResults.decrypted,
+          votesA: pollResults.votesA,
+          votesB: pollResults.votesB,
+        })
+        // Don't add basic logs - let the hybrid mock handle all logging
+        // addLog("success", "vote", `Poll ${poll.id} results updated from FHEVM system`, {
+        //   votesA: pollResults.votesA,
+        //   votesB: pollResults.votesB,
+        //   decrypted: pollResults.decrypted,
+        // })
+        return
+      }
+      
+      // Fallback to API if hybrid mock not available
       const response = await fetch(`/api/poll/${poll.id}`)
       if (response.ok) {
         const data = await response.json()
         setResults(data)
-        addLog("success", "vote", `Poll ${poll.id} results fetched`, {
+        addLog("success", "vote", `Poll ${poll.id} results fetched from API`, {
           votesA: data.votesA,
           votesB: data.votesB,
           decrypted: data.decrypted,
         })
       } else {
         addLog("error", "ui", `Failed to fetch results for poll ${poll.id}: ${response.status}`)
-        // Set mock results when API fails
+        // Set default results when API fails
         setResults({
           decrypted: false,
           votesA: 0,
@@ -73,7 +93,7 @@ export function PollCard({ poll, addLog, clearLogs, onTransactionStart, onTransa
       }
     } catch (error) {
       addLog("error", "vote", `Failed to fetch results for poll ${poll.id}`, error)
-      // Set mock results when fetch fails
+      // Set default results when fetch fails
       setResults({
         decrypted: false,
         votesA: 0,
@@ -104,56 +124,72 @@ export function PollCard({ poll, addLog, clearLogs, onTransactionStart, onTransa
     setIsVoting(true)
     setSelectedOption(option)
     
-    // Clear old logs for fresh vote session
-    clearLogs?.()
-    
-    // Notify parent that transaction is starting
-    onTransactionStart?.()
+        // Don't clear logs - let FHEVM logs handle the logging
+        // clearLogs?.()
+        
+        // Notify parent that transaction is starting
+        onTransactionStart?.()
 
-    addLog("info", "ui", `🔄 Starting fresh vote session for poll ${poll.id}`)
-    addLog("info", "vote", `Submitting vote for poll ${poll.id}: Option ${option}`)
-    addLog("info", "fhevm", `Encrypting vote for poll ${poll.id}`)
+        try {
+          // Use hybrid mock FHEVM for realistic vote processing
+          console.log("[Debug] About to vote - FHEVM:", !!fhevm, "Methods:", {
+            createEncryptedInput: !!fhevm?.createEncryptedInput,
+            submitEncryptedVote: !!fhevm?.submitEncryptedVote
+          })
+          
+          if (fhevm && fhevm.createEncryptedInput && fhevm.submitEncryptedVote) {
+            console.log("[Debug] Calling createEncryptedInput...")
+            // Create encrypted input using hybrid mock (this will show realistic logs)
+            const encryptedVote = await fhevm.createEncryptedInput(option === "A" ? 0 : 1, poll.id)
+            console.log("[Debug] Encrypted vote created:", encryptedVote)
+            
+            console.log("[Debug] Calling submitEncryptedVote...")
+            // Submit encrypted vote using hybrid mock (this will show realistic logs)
+            await fhevm.submitEncryptedVote(encryptedVote, poll.id)
+            console.log("[Debug] Vote submitted successfully")
+            
+            // Don't add basic logs - let the hybrid mock handle all logging
+          } else {
+            // Only use fallback if hybrid mock not available
+            addLog("warning", "fhevm", "FHEVM system not available, using fallback")
+            addLog("info", "fhevm", `🔐 FHEVM: Initializing homomorphic encryption for vote`)
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
+            addLog("info", "fhevm", `⚡ FHEVM: Encrypting vote data using FHE scheme`)
+            await new Promise(resolve => setTimeout(resolve, 800))
+            
+            addLog("success", "fhevm", `✅ FHEVM: Vote encrypted successfully - data remains private`)
+            await new Promise(resolve => setTimeout(resolve, 300))
+            
+            addLog("info", "blockchain", `📊 FHEVM: Performing homomorphic computation on encrypted data`)
+            await new Promise(resolve => setTimeout(resolve, 600))
+            
+            addLog("info", "blockchain", `🔗 FHEVM: Aggregating encrypted vote with existing poll results`)
+            await new Promise(resolve => setTimeout(resolve, 400))
+            
+            addLog("success", "blockchain", `✅ FHEVM: Vote processed - privacy preserved throughout computation`)
+          }
 
-    try {
-      // Simulate realistic FHEVM flow
-      addLog("info", "fhevm", `🔐 FHEVM: Initializing homomorphic encryption for vote`)
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
-      addLog("info", "fhevm", `⚡ FHEVM: Encrypting vote data using FHE scheme`)
-      await new Promise(resolve => setTimeout(resolve, 800))
-      
-      addLog("success", "fhevm", `✅ FHEVM: Vote encrypted successfully - data remains private`)
-      await new Promise(resolve => setTimeout(resolve, 300))
-      
-      addLog("info", "blockchain", `📊 FHEVM: Performing homomorphic computation on encrypted data`)
-      await new Promise(resolve => setTimeout(resolve, 600))
-      
-      addLog("info", "blockchain", `🔗 FHEVM: Aggregating encrypted vote with existing poll results`)
-      await new Promise(resolve => setTimeout(resolve, 400))
-      
-      addLog("success", "blockchain", `✅ FHEVM: Vote processed - privacy preserved throughout computation`)
-      addLog("success", "vote", `✅ Vote submitted successfully for poll ${poll.id}`)
+          setHasVoted(true)
+          // Don't add basic logs - let the hybrid mock handle all logging
 
-      setHasVoted(true)
-      // For demo purposes, don't persist vote state - allow seamless voting
-      // localStorage.setItem(`poll_${poll.id}_voted`, "true")
-      addLog("info", "ui", `Vote submitted for poll ${poll.id}`)
-
-      // Reset voting state immediately after successful submission
-      setIsVoting(false)
-      
-      // Auto-reset vote state after a short delay for seamless experience
-      setTimeout(() => {
-        setHasVoted(false)
-        addLog("info", "ui", `Poll ${poll.id}: Vote state reset`)
-      }, 2000) // 2 second delay
-      
-      // Fetch results in background
-      fetchResults().catch(console.error)
-      
-      // Notify parent that transaction completed successfully
-      onTransactionComplete?.()
-    } catch (error) {
+          // Reset voting state immediately after successful submission
+          setIsVoting(false)
+          
+          // Auto-reset vote state after a short delay for seamless experience
+          setTimeout(() => {
+            setHasVoted(false)
+            // Don't add basic logs - let the hybrid mock handle all logging
+          }, 2000) // 2 second delay
+          
+          // Immediately update results to show the new vote count
+          setTimeout(() => {
+            fetchResults()
+          }, 1000) // Small delay to let the vote process complete
+          
+          // Notify parent that transaction completed successfully
+          onTransactionComplete?.()
+        } catch (error) {
       addLog("error", "vote", `Voting error for poll ${poll.id}`, error)
       console.error("[FHEVM] Voting error:", error)
       
@@ -165,9 +201,10 @@ export function PollCard({ poll, addLog, clearLogs, onTransactionStart, onTransa
     }
   }
 
-  const totalVotes = results ? results.votesA + results.votesB : 0
-  const percentA = totalVotes > 0 ? (results!.votesA / totalVotes) * 100 : 0
-  const percentB = totalVotes > 0 ? (results!.votesB / totalVotes) * 100 : 0
+      const totalVotes = results ? results.votesA + results.votesB : 0
+      const shouldShowResults = results && results.decrypted && totalVotes > 0
+      const percentA = shouldShowResults ? (results!.votesA / totalVotes) * 100 : 0
+      const percentB = shouldShowResults ? (results!.votesB / totalVotes) * 100 : 0
 
   return (
     <Card className="border-gray-800 bg-gray-900 p-4">
@@ -209,30 +246,30 @@ export function PollCard({ poll, addLog, clearLogs, onTransactionStart, onTransa
       {/* Options */}
       <div className="space-y-2">
         {/* Option A */}
-        <button
-          onClick={() => handleVote("A")}
-          disabled={hasVoted}
-          className={cn(
-            "relative w-full overflow-hidden rounded-lg border p-3 text-left transition-all",
-            hasVoted ? "cursor-not-allowed border-gray-700" : "cursor-pointer border-gray-700 hover:border-[#fed217]",
-            selectedOption === "A" && isVoting && "border-[#fed217]",
-          )}
-        >
-          {/* Progress bar */}
-          {results?.decrypted && (
-            <div className="absolute inset-0 bg-[#fed217]/20 transition-all" style={{ width: `${percentA}%` }} />
-          )}
+            <button
+              onClick={() => handleVote("A")}
+              disabled={hasVoted}
+              className={cn(
+                "relative w-full overflow-hidden rounded-lg border p-3 text-left transition-all",
+                hasVoted ? "cursor-not-allowed border-gray-700" : "cursor-pointer border-gray-700 hover:border-[#fed217]",
+                selectedOption === "A" && isVoting && "border-[#fed217]",
+              )}
+            >
+              {/* Progress bar */}
+              {shouldShowResults && (
+                <div className="absolute inset-0 bg-[#fed217]/20 transition-all" style={{ width: `${percentA}%` }} />
+              )}
 
-          <div className="relative flex items-center justify-between">
-            <span className="text-sm font-medium text-white">{poll.optionA}</span>
-            {results?.decrypted && (
-              <span className="text-xs text-gray-400">
-                {percentA.toFixed(1)}% ({results.votesA})
-              </span>
-            )}
-            {isVoting && selectedOption === "A" && <Loader2 className="h-4 w-4 animate-spin text-[#fed217]" />}
-          </div>
-        </button>
+              <div className="relative flex items-center justify-between">
+                <span className="text-sm font-medium text-white">{poll.optionA}</span>
+                {shouldShowResults && (
+                  <span className="text-xs text-gray-400">
+                    {percentA.toFixed(1)}% ({results.votesA})
+                  </span>
+                )}
+                {isVoting && selectedOption === "A" && <Loader2 className="h-4 w-4 animate-spin text-[#fed217]" />}
+              </div>
+            </button>
 
         {/* Option B */}
         <button
@@ -245,13 +282,13 @@ export function PollCard({ poll, addLog, clearLogs, onTransactionStart, onTransa
           )}
         >
           {/* Progress bar */}
-          {results?.decrypted && (
+          {shouldShowResults && (
             <div className="absolute inset-0 bg-[#fed217]/20 transition-all" style={{ width: `${percentB}%` }} />
           )}
 
           <div className="relative flex items-center justify-between">
             <span className="text-sm font-medium text-white">{poll.optionB}</span>
-            {results?.decrypted && (
+            {shouldShowResults && (
               <span className="text-xs text-gray-400">
                 {percentB.toFixed(1)}% ({results.votesB})
               </span>

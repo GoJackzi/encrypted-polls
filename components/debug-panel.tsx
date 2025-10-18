@@ -227,7 +227,8 @@ export function usePollLogs() {
     (level: LogEntry["level"], category: LogEntry["category"], message: string, data?: any) => {
       const timestamp = new Date().toLocaleTimeString()
       const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-      setLogs((prev) => [...prev, { id, timestamp, level, category, message, data }])
+      const newLog = { id, timestamp, level, category, message, data }
+      setLogs((prev) => [...prev, newLog])
     },
     [],
   )

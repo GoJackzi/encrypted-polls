@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "",
+    "payload": "",
+    "signature": ""
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Encrypted Polls",
+    "iconUrl": "https://encrypted-polls.vercel.app/icon.png",
+    "homeUrl": "https://encrypted-polls.vercel.app",
+    "splashImageUrl": "https://encrypted-polls.vercel.app/icon.png",
+    "splashBackgroundColor": "#000000",
+    "heroImageUrl": "https://encrypted-polls.vercel.app/icon.png",
+    "tagline": "Vote Privately, Think Freely"
+  }
+}
+

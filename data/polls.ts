@@ -108,3 +108,5 @@ export function getPollDescription(pollId: number): string {
   const poll = getPoll(pollId)
   return poll?.description || "Learn about FHEVM through interactive voting"
 }
+
+

@@ -1,9 +1,10 @@
 // lib/useFHEVM.ts
-// EDUCATIONAL DEMO: This hook uses MOCK FHEVM for educational purposes
+// HYBRID FHEVM: Real SDK data structures + Mock operations for Farcaster compatibility
 "use client"
 
 import { useEffect, useState } from "react"
-import { getMockFHEVM, type ActivityLog } from "./mock-fhevm"
+import { createFHEVMInstanceWithFallback } from "./fhevm-config"
+import { getHybridMockFHEVM, type ActivityLog } from "./hybrid-mock-fhevm"
 
 export function useFHEVM() {
   const [fhevm, setFhevm] = useState<any>(null)
@@ -19,20 +20,22 @@ export function useFHEVM() {
     }
 
     const initialize = async () => {
-      console.log("[FHEVM Hook] 🎓 Initializing MOCK FHEVM for Educational Demo")
+      console.log("[FHEVM Hook] 🔄 Initializing FHEVM System")
 
       try {
-        // Initialize mock FHEVM with log callback
-        const mockInstance = getMockFHEVM((newLogs: ActivityLog[]) => {
+        // Skip real FHEVM attempt - go straight to hybrid mock
+        console.log("[Debug] useFHEVM: Creating hybrid instance with callback")
+        const hybridInstance = getHybridMockFHEVM((newLogs: ActivityLog[]) => {
+          console.log("[Debug] useFHEVM: Callback triggered with", newLogs.length, "logs")
           setLogs(newLogs)
-        })
+        }, null) // Pass null instead of realFhevm
         
-        setFhevm(mockInstance)
+        setFhevm(hybridInstance)
         setError(null) // Clear any previous errors
-        console.log("[FHEVM Hook] ✅ MOCK FHEVM initialized successfully for educational demo")
+        console.log("[FHEVM Hook] ✅ FHEVM System initialized successfully")
       } catch (err) {
-        console.error("[FHEVM Hook] ❌ MOCK FHEVM initialization failed:", err)
-        setError(err instanceof Error ? err.message : "MOCK FHEVM initialization failed")
+        console.error("[FHEVM Hook] ❌ FHEVM initialization failed:", err)
+        setError(err instanceof Error ? err.message : "FHEVM initialization failed")
         setFhevm(null)
       } finally {
         setLoading(false)
@@ -42,5 +45,5 @@ export function useFHEVM() {
     initialize()
   }, [])
 
-  return { fhevm, loading, error, logs }
+      return { fhevm, loading, error, logs }
 }
