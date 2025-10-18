@@ -30,8 +30,8 @@ Edit \`.env.local\`:
 
 \`\`\`env
 NEXT_PUBLIC_CONTRACT_ADDRESS=<your_deployed_contract_address>
-NEXT_PUBLIC_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/RSaO0kH_yHZrcI8-GfcF4YOT3t4bSDpQ
-PRIVATE_KEY=d0a38d481f2d5406763e6769ba05af70ef7d2e6cedaa6dd21ee94720873a1c20
+NEXT_PUBLIC_ALCHEMY_SEPOLIA_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY_HERE
+PRIVATE_KEY=your_private_key_here
 \`\`\`
 
 ### 4. Initialize Zama Client

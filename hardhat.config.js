@@ -14,8 +14,8 @@ export default {
   },
   networks: {
     sepolia: {
-      url: "https://eth-sepolia.g.alchemy.com/v2/RSaO0kH_yHZrcI8-GfcF4YOT3t4bSDpQ",
-      accounts: ["d0a38d481f2d5406763e6769ba05af70ef7d2e6cedaa6dd21ee94720873a1c20"],
+      url: process.env.NEXT_PUBLIC_ALCHEMY_SEPOLIA_URL || "https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY_HERE",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 11155111
     },
     localhost: {

@@ -1,6 +1,6 @@
 // Contract interaction utilities
 export const CONTRACT_ADDRESS = "0x024F8A35B856F1cb088619f681BD3a199058b576"
-export const RPC_URL = "https://eth-sepolia.g.alchemy.com/v2/RSaO0kH_yHZrcI8-GfcF4YOT3t4bSDpQ"
+export const RPC_URL = process.env.NEXT_PUBLIC_ALCHEMY_SEPOLIA_URL || "https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY_HERE"
 
 // Contract ABI (from newly deployed contract)
 export const CONTRACT_ABI = [

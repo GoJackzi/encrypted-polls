@@ -7,7 +7,7 @@ import { http, createConfig } from "wagmi"
 export const wagmiConfig = createConfig({
   chains: [sepolia],
   transports: {
-    [sepolia.id]: http('https://eth-sepolia.g.alchemy.com/v2/RSaO0kH_yHZrcI8-GfcF4YOT3t4bSDpQ'),
+    [sepolia.id]: http(process.env.NEXT_PUBLIC_ALCHEMY_SEPOLIA_URL || 'https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY_HERE'),
   },
   ssr: true,
 })

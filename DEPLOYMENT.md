@@ -33,7 +33,7 @@ npx hardhat verify --network sepolia <CONTRACT_ADDRESS>
 ## Configuration
 
 - **Network**: Ethereum Sepolia Testnet
-- **RPC URL**: https://eth-sepolia.g.alchemy.com/v2/RSaO0kH_yHZrcI8-GfcF4YOT3t4bSDpQ
+- **RPC URL**: Use environment variable `NEXT_PUBLIC_ALCHEMY_SEPOLIA_URL`
 - **Private Key**: Configured in hardhat.config.json
 
 ## Contract Features

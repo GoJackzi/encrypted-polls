@@ -2,7 +2,7 @@
 // IMPORTANT: This configuration NEVER uses mock FHEVM - only real Zama Sepolia integration
 export const FHEVM_CONFIG = {
   chainId: 11155111, // Sepolia
-  rpcUrl: "https://eth-sepolia.g.alchemy.com/v2/RSaO0kH_yHZrcI8-GfcF4YOT3t4bSDpQ",
+  rpcUrl: process.env.NEXT_PUBLIC_ALCHEMY_SEPOLIA_URL || "https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY_HERE",
   relayerUrl: "https://relayer.testnet.zama.cloud",
 
   executorContractAddress: "0x848B0066793BcC60346Da1F49049357399B8D595",
