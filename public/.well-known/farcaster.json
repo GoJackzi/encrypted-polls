@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjI2NjM3MSwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDNhOEVmMTE2OTJhNmIzQjg5Y2JlMTlkMzQ2NGE1NzIzMjI2ZjQ2ZUYifQ",
+    "payload": "eyJkb21haW4iOiJlbmNyeXB0ZWQtcG9sbHMudmVyY2VsLmFwcCJ9",
+    "signature": "EAUqFsdVGez2psWT4NlSFbLHDtglvfmS54gF/x74WddpLfh0/ZbHXBq5bet8fOayNMI4hDBkoYaBDkYzfhUeCBs="
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Encrypted Polls",
+    "iconUrl": "https://encrypted-polls.vercel.app/icon.png",
+    "homeUrl": "https://encrypted-polls.vercel.app",
+    "splashImageUrl": "https://encrypted-polls.vercel.app/icon.png",
+    "splashBackgroundColor": "#000000",
+    "heroImageUrl": "https://encrypted-polls.vercel.app/icon.png",
+    "tagline": "Vote Privately, Think Freely"
+  }
+}
+
